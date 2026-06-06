@@ -1,0 +1,79 @@
+.dl-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.dl-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: white;
+  border: 0.5px solid #d3d1c7;
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  transition: border-color 0.15s;
+}
+
+.dl-card:hover {
+  border-color: #b4b2a9;
+}
+
+.dl-card-name {
+  font-size: 15px;
+  font-weight: 500;
+  color: #2c2c2a;
+  margin: 0 0 4px;
+}
+
+.dl-card-meta {
+  font-size: 12px;
+  color: #888780;
+  margin: 0;
+}
+
+.dl-study-btn {
+  padding: 0.5rem 1rem;
+  background: #2c2c2a;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+  transition: opacity 0.15s;
+  flex-shrink: 0;
+}
+.dl-study-btn:hover { opacity: 0.8; }
+
+.dl-state {
+  text-align: center;
+  padding: 3rem;
+  color: #888780;
+  font-size: 15px;
+}
+
+.dl-error { color: #c0392b; }
+
+.dl-empty {
+  text-align: center;
+  padding: 4rem 2rem;
+}
+
+.dl-empty-title {
+  font-size: 18px;
+  font-weight: 500;
+  color: #2c2c2a;
+  margin: 0 0 0.5rem;
+}
+
+.dl-empty-sub {
+  font-size: 14px;
+  color: #888780;
+  margin: 0;
+}

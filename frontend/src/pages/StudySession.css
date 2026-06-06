@@ -1,0 +1,294 @@
+/* ── Layout ──────────────────────────────────────────────────────────────────── */
+.ss-container {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 0 1rem 4rem;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.ss-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  gap: 1rem;
+  text-align: center;
+  padding: 2rem;
+}
+
+/* ── Header ──────────────────────────────────────────────────────────────────── */
+.ss-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 0 1rem;
+}
+
+.ss-back {
+  background: none;
+  border: none;
+  font-size: 14px;
+  color: #888780;
+  cursor: pointer;
+  padding: 0;
+  font-family: inherit;
+}
+.ss-back:hover { color: #2c2c2a; }
+
+.ss-deck-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: #2c2c2a;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ss-counter {
+  font-size: 13px;
+  color: #888780;
+}
+
+/* ── Progress ────────────────────────────────────────────────────────────────── */
+.ss-progress-bar {
+  width: 100%;
+  height: 4px;
+  background: #e8e6df;
+  border-radius: 2px;
+  margin-bottom: 2rem;
+  overflow: hidden;
+}
+
+.ss-progress-fill {
+  height: 100%;
+  background: #378add;
+  border-radius: 2px;
+  transition: width 0.4s ease;
+}
+
+/* ── Card flip ───────────────────────────────────────────────────────────────── */
+.ss-card-wrap {
+  perspective: 1200px;
+  margin-bottom: 1.5rem;
+}
+
+/*
+  The rotating element. Front and back are direct children — no wrapper div
+  in between — so preserve-3d works correctly.
+*/
+.ss-card {
+  width: 100%;
+  height: 260px;
+  position: relative;
+  transform-style: preserve-3d;        /* 3D space for children */
+  transition: transform 0.45s ease;
+  cursor: pointer;
+}
+
+.ss-card.flipped {
+  transform: rotateY(180deg);
+  cursor: default;
+}
+
+/* Both faces: absolutely fill the card, hidden when facing away */
+.ss-card-front,
+.ss-card-back {
+  position: absolute;
+  inset: 0;                             /* top/right/bottom/left: 0 */
+  border-radius: 16px;
+  border: 0.5px solid #d3d1c7;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  backface-visibility: hidden;          /* hide when rotated away */
+  -webkit-backface-visibility: hidden;
+}
+
+.ss-card-front {
+  background: white;
+}
+
+.ss-card-back {
+  background: #f7f6f0;
+  transform: rotateY(180deg);           /* start pre-rotated; shown when card flips */
+}
+
+.ss-card-label {
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #a9a7a0;
+  margin-bottom: 1rem;
+  display: block;
+}
+
+.ss-card-text {
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 1.6;
+  color: #2c2c2a;
+  margin: 0;
+}
+
+.ss-tap-hint {
+  margin-top: 1.5rem;
+  font-size: 12px;
+  color: #a9a7a0;
+}
+
+/* ── Ratings ─────────────────────────────────────────────────────────────────── */
+.ss-ratings {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(8px);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.ss-ratings.visible {
+  opacity: 1;
+  pointer-events: all;
+  transform: translateY(0);
+  transition: opacity 0.25s ease 0.3s, transform 0.25s ease 0.3s;
+}
+
+.ss-ratings-label {
+  font-size: 12px;
+  color: #888780;
+  text-align: center;
+  margin: 0 0 0.75rem;
+}
+
+.ss-ratings-row {
+  display: flex;
+  gap: 6px;
+}
+
+.ss-rating-btn {
+  flex: 1;
+  padding: 10px 4px;
+  border-radius: 10px;
+  border: 1.5px solid var(--rating-color);
+  background: white;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  transition: background 0.15s;
+  font-family: inherit;
+}
+
+.ss-rating-btn:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--rating-color) 10%, white);
+}
+
+.ss-rating-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.ss-rating-num {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--rating-color);
+}
+
+.ss-rating-label {
+  font-size: 10px;
+  color: #888780;
+  font-weight: 500;
+}
+
+/* ── Meta / Done / States ────────────────────────────────────────────────────── */
+.ss-meta {
+  text-align: center;
+  font-size: 11px;
+  color: #c4c2bb;
+  margin-top: 1.25rem;
+  font-family: monospace;
+}
+
+.ss-loading {
+  font-size: 15px;
+  color: #888780;
+}
+
+.ss-error {
+  font-size: 15px;
+  color: #c0392b;
+  margin-bottom: 1rem;
+}
+
+.ss-done {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.ss-done-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #e8f5e9;
+  color: #27ae60;
+  font-size: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.5rem;
+}
+
+.ss-done-title {
+  font-size: 22px;
+  font-weight: 500;
+  margin: 0;
+}
+
+.ss-done-sub {
+  font-size: 15px;
+  color: #888780;
+  margin: 0;
+}
+
+.ss-done-note {
+  font-size: 13px;
+  color: #a9a7a0;
+  margin: 0;
+}
+
+.ss-btn-primary {
+  margin-top: 1rem;
+  padding: 0.65rem 1.5rem;
+  background: #2c2c2a;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  transition: opacity 0.15s;
+}
+.ss-btn-primary:hover { opacity: 0.85; }
+
+.ss-btn-outline {
+  padding: 0.65rem 1.5rem;
+  background: white;
+  color: #2c2c2a;
+  border: 0.5px solid #b4b2a9;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  font-family: inherit;
+}
+.ss-btn-outline:hover { background: #f1efe8; }

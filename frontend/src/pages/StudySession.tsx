@@ -128,7 +128,7 @@ export default function StudySession({ deckId, deckName, onBack }: {
       {/* Header */}
       <div className="ss-header">
         <button className="ss-back" onClick={onBack}>← Back</button>
-        <span className="ss-deck-name">{deckName}</span>
+        <span className="ss-deck-name">Current Deck: {deckName}</span>
         <span className="ss-counter">{index + 1} / {cards.length}</span>
       </div>
 
@@ -178,10 +178,6 @@ export default function StudySession({ deckId, deckName, onBack }: {
         </div>
       </div>
 
-      {/* Card metadata (subtle) */}
-      <div className="ss-meta">
-        EF: {card.ef.toFixed(2)} · Interval: {card.interval}d · Reviews: {card.reps}
-      </div>
 
     </div>
   );

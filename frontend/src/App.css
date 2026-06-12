@@ -1,11 +1,10 @@
 .app {
   min-height: 100vh;
-  background: #fafbf8;
+  background: #202220;
 }
 
 .app-header {
-  background: white;
-  border-bottom: 0.5px solid #d3d1c7;
+  background: #202220;
   padding: 2rem;
   text-align: center;
 }
@@ -14,6 +13,7 @@
   margin: 0 0 0.5rem;
   font-size: 32px;
   font-weight: 500;
+  color: white;
 }
 
 .app-header p {
@@ -24,4 +24,15 @@
 
 .app-main {
   padding: 2rem 0;
+}
+
+.app-nav-btn {
+  background: #2c2c2a;
+  color: white;
+
+}
+
+.app-nav-btn.active {
+  background: #f1efe8;
+  color: black;
 }

@@ -31,18 +31,18 @@
   background: none;
   border: none;
   font-size: 14px;
-  color: #888780;
+  color: #b0b0b0;
   cursor: pointer;
   padding: 0;
   font-family: inherit;
 }
-.ss-back:hover { color: #2c2c2a; }
+.ss-back:hover { color: #9a9a9a; }
 
 .ss-deck-name {
-  font-size: 14px;
+  font-size: 18px;
   font-weight: 500;
-  color: #2c2c2a;
-  max-width: 200px;
+  color: white;
+  max-width: 520px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -50,7 +50,7 @@
 
 .ss-counter {
   font-size: 13px;
-  color: #888780;
+  color: #b0b0b0;
 }
 
 /* ── Progress ────────────────────────────────────────────────────────────────── */
@@ -100,7 +100,6 @@
   position: absolute;
   inset: 0;                             /* top/right/bottom/left: 0 */
   border-radius: 16px;
-  border: 0.5px solid #d3d1c7;
   padding: 2rem;
   display: flex;
   flex-direction: column;
@@ -113,11 +112,11 @@
 }
 
 .ss-card-front {
-  background: white;
+  background: #555555;
 }
 
 .ss-card-back {
-  background: #f7f6f0;
+  background: #555555;
   transform: rotateY(180deg);           /* start pre-rotated; shown when card flips */
 }
 
@@ -126,7 +125,7 @@
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: #a9a7a0;
+  color: white;
   margin-bottom: 1rem;
   display: block;
 }
@@ -135,14 +134,14 @@
   font-size: 20px;
   font-weight: 400;
   line-height: 1.6;
-  color: #2c2c2a;
+  color: white;
   margin: 0;
 }
 
 .ss-tap-hint {
   margin-top: 1.5rem;
   font-size: 12px;
-  color: #a9a7a0;
+  color: white;
 }
 
 /* ── Ratings ─────────────────────────────────────────────────────────────────── */
@@ -162,7 +161,7 @@
 
 .ss-ratings-label {
   font-size: 12px;
-  color: #888780;
+  color: #f7f6f0;
   text-align: center;
   margin: 0 0 0.75rem;
 }
@@ -177,7 +176,7 @@
   padding: 10px 4px;
   border-radius: 10px;
   border: 1.5px solid var(--rating-color);
-  background: white;
+  background: #bfbfbf;
   cursor: pointer;
   display: flex;
   flex-direction: column;
@@ -204,7 +203,7 @@
 
 .ss-rating-label {
   font-size: 10px;
-  color: #888780;
+  color: #222222;
   font-weight: 500;
 }
 

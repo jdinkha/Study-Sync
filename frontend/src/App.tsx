@@ -14,7 +14,9 @@ export default function App() {
   const [refreshKey, setRefreshKey] = useState(0);
 
   function goToDecks() {
-    setRefreshKey(k => k + 1); // force DeckList to re-fetch
+    if (view.name !== 'decks') {
+      setRefreshKey(k => k + 1); // force DeckList to re-fetch if not already on decks
+    }
     setView({ name: 'decks' });
   }
 
@@ -36,7 +38,7 @@ export default function App() {
                 className={`app-nav-btn ${view.name === 'upload' ? 'active' : ''}`}
                 onClick={() => setView({ name: 'upload' })}
               >
-                + Upload PDF
+                Upload PDF
               </button>
             </nav>
           </div>

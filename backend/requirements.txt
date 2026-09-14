@@ -4,3 +4,4 @@ sqlalchemy==2.0.23
 pymupdf==1.23.8
 httpx==0.25.2
 python-multipart==0.0.6
+python-dotenv==1.0.0

@@ -5,6 +5,7 @@ interface Card {
   id: string;
   front: string;
   back: string;
+  choices: string[];
   ef: number;
   interval: number;
   reps: number;
@@ -27,6 +28,7 @@ export default function StudySession({ deckId, deckName, onBack }: {
   const [cards, setCards] = useState<Card[]>([]);
   const [index, setIndex] = useState(0);
   const [flipped, setFlipped] = useState(false);
+  const [selectedChoice, setSelectedChoice] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
@@ -65,6 +67,7 @@ export default function StudySession({ deckId, deckName, onBack }: {
 
       setReviewed(r => r + 1);
       setFlipped(false);
+      setSelectedChoice(null);
 
       // Brief pause so the flip-back animates before advancing
       setTimeout(() => {
@@ -120,6 +123,15 @@ export default function StudySession({ deckId, deckName, onBack }: {
 
   const card = cards[index];
   const progress = ((index) / cards.length) * 100;
+  const hasChoices = card.choices && card.choices.length > 0;
+  const isCorrect = selectedChoice !== null &&
+    selectedChoice.trim().toLowerCase() === card.back.trim().toLowerCase();
+
+  function handleChoice(choice: string) {
+    if (flipped) return;
+    setSelectedChoice(choice);
+    setFlipped(true);
+  }
 
   // ── Study UI ──────────────────────────────────────────────────────────────────
   return (
@@ -139,21 +151,39 @@ export default function StudySession({ deckId, deckName, onBack }: {
 
       {/* Card */}
       <div className="ss-card-wrap">
-        <div
-          className={`ss-card ${flipped ? 'flipped' : ''}`}
-          onClick={() => !flipped && setFlipped(true)}
-        >
+        <div className={`ss-card ${flipped ? 'flipped' : ''}`}>
           {/* Front */}
           <div className="ss-card-front">
             <span className="ss-card-label">Question</span>
             <p className="ss-card-text">{card.front}</p>
-            <span className="ss-tap-hint">Tap to reveal answer</span>
+            {hasChoices ? (
+              <div className="ss-choices">
+                {card.choices.map((choice, i) => (
+                  <button
+                    key={i}
+                    className="ss-choice-btn"
+                    onClick={() => handleChoice(choice)}
+                  >
+                    {choice}
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <button className="ss-reveal-btn" onClick={() => setFlipped(true)}>
+                Tap to reveal answer
+              </button>
+            )}
           </div>
 
           {/* Back */}
           <div className="ss-card-back">
-            <span className="ss-card-label">Answer</span>
+            <span className="ss-card-label">
+              {hasChoices ? (isCorrect ? 'Correct!' : 'Not quite') : 'Answer'}
+            </span>
             <p className="ss-card-text">{card.back}</p>
+            {hasChoices && !isCorrect && selectedChoice && (
+              <p className="ss-your-answer">You chose: {selectedChoice}</p>
+            )}
           </div>
         </div>
       </div>

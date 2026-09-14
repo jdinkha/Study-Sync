@@ -82,11 +82,10 @@
 */
 .ss-card {
   width: 100%;
-  height: 260px;
+  height: 420px;
   position: relative;
   transform-style: preserve-3d;        /* 3D space for children */
   transition: transform 0.45s ease;
-  cursor: pointer;
 }
 
 .ss-card.flipped {
@@ -142,6 +141,49 @@
   margin-top: 1.5rem;
   font-size: 12px;
   color: white;
+}
+
+.ss-reveal-btn {
+  margin-top: 1.5rem;
+  background: none;
+  border: none;
+  font-size: 12px;
+  color: white;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.ss-choices {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  margin-top: 1.25rem;
+}
+
+.ss-choice-btn {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.08);
+  color: white;
+  font-size: 14px;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.ss-choice-btn:hover {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.6);
+}
+
+.ss-your-answer {
+  margin-top: 0.75rem;
+  font-size: 13px;
+  color: #f0d9d9;
 }
 
 /* ── Ratings ─────────────────────────────────────────────────────────────────── */

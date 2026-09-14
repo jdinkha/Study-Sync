@@ -27,11 +27,12 @@
   font-size: 18px;
   font-weight: 500;
   margin: 0 0 0.5rem;
+  color: white
 }
 
 .upload-subtitle {
   font-size: 14px;
-  color: #888780;
+  color: #999890;
   margin: 0;
 }
 

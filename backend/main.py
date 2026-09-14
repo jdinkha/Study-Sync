@@ -1,6 +1,7 @@
 from fastapi import FastAPI, HTTPException, File, UploadFile, Form
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+from dotenv import load_dotenv
 import httpx
 import json
 import re
@@ -8,11 +9,17 @@ import os
 import tempfile
 import datetime
 import uuid
+import random
 from pathlib import Path
 
 import pymupdf
-from sqlalchemy import create_engine, Column, String, Float, Integer, DateTime
+from sqlalchemy import create_engine, Column, String, Float, Integer, DateTime, text
 from sqlalchemy.orm import declarative_base, Session, sessionmaker
+
+load_dotenv()  # reads .env file if present
+
+OLLAMA_HOST = os.getenv("OLLAMA_HOST", "http://localhost:11434")
+OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "mistral")  # fallback to mistral if not set
 
 app = FastAPI()
 
@@ -42,6 +49,7 @@ class Card(Base):
     deckId = Column(String)
     front = Column(String)
     back = Column(String)
+    choices = Column(String, nullable=True)  # JSON-encoded list of 4 multiple-choice options
     ef = Column(Float, default=2.5)
     interval = Column(Integer, default=0)
     reps = Column(Integer, default=0)
@@ -56,6 +64,13 @@ class ReviewLog(Base):
     reviewedAt = Column(DateTime, default=datetime.datetime.utcnow)
 
 Base.metadata.create_all(bind=engine)
+
+# Migrate older sqlite files created before the "choices" column existed
+with engine.connect() as conn:
+    existing_cols = [row[1] for row in conn.execute(text("PRAGMA table_info(cards)"))]
+    if "choices" not in existing_cols:
+        conn.execute(text("ALTER TABLE cards ADD COLUMN choices TEXT"))
+        conn.commit()
 
 class ReviewRequest(BaseModel):
     cardId: str
@@ -73,8 +88,35 @@ async def extract_text_from_pdf(filepath: str) -> list[str]:
     doc.close()
     return chunks
 
+def extract_valid_cards(cards) -> list[dict]:
+    """Validate a parsed JSON array into multiple-choice card dicts."""
+    valid = []
+    if not isinstance(cards, list):
+        return valid
+    for c in cards:
+        if not isinstance(c, dict):
+            continue
+        front = str(c.get("front", "")).strip()
+        choices = c.get("choices")
+        answer = str(c.get("answer", "")).strip()
+
+        if not front or front == "?" or not isinstance(choices, list) or len(choices) != 4:
+            continue
+
+        choices = [str(ch).strip() for ch in choices]
+        if any(not ch or ch == "?" for ch in choices):
+            continue
+
+        # The answer must be the exact text of one of the choices
+        match = next((ch for ch in choices if ch.lower() == answer.lower()), None)
+        if not match:
+            continue
+
+        valid.append({"front": front, "choices": choices, "answer": match})
+    return valid
+
 def parse_ollama_response(text: str) -> list[dict]:
-    """Parse JSON from Ollama, handling control characters and markdown fences."""
+    """Parse JSON from Ollama, being very defensive about malformed input."""
     text = text.strip()
 
     # Strip markdown code fences
@@ -85,15 +127,26 @@ def parse_ollama_response(text: str) -> list[dict]:
         text = text[:-3]
     text = text.strip()
 
-    # Find the JSON array
-    match = re.search(r'\[.*\]', text, re.DOTALL)
-    if not match:
-        print(f"[PARSE] No JSON array found in: {text[:200]}")
+    # Try to find and extract the JSON array
+    start = text.find('[')
+    end = text.rfind(']')
+
+    if start == -1 or end == -1 or start >= end:
+        print(f"[PARSE] No JSON array found")
         return []
 
-    raw = match.group()
+    raw = text[start:end+1]
 
-    # Fix literal newlines/tabs inside JSON string values (Ollama sometimes does this)
+    # First attempt: try to parse as-is
+    try:
+        cards = json.loads(raw)
+        valid = extract_valid_cards(cards)
+        if valid:
+            return valid
+    except json.JSONDecodeError:
+        pass
+
+    # Second attempt: sanitize newlines inside string values
     def sanitize(s: str) -> str:
         result = []
         in_string = False
@@ -101,67 +154,64 @@ def parse_ollama_response(text: str) -> list[dict]:
         while i < len(s):
             ch = s[i]
             prev = s[i - 1] if i > 0 else ''
+
             if ch == '"' and prev != '\\':
                 in_string = not in_string
                 result.append(ch)
-            elif in_string:
-                if ch == '\n':
-                    result.append('\\n')
-                elif ch == '\r':
-                    result.append('\\r')
-                elif ch == '\t':
-                    result.append('\\t')
-                else:
-                    result.append(ch)
+            elif in_string and ch in '\n\r\t':
+                # Replace control chars with space inside strings
+                result.append(' ')
             else:
                 result.append(ch)
             i += 1
         return ''.join(result)
 
     cleaned = sanitize(raw)
-
     try:
         cards = json.loads(cleaned)
-        valid = []
-        for c in cards:
-            if isinstance(c, dict) and c.get("front") and c.get("back"):
-                valid.append({
-                    "front": str(c["front"]).strip(),
-                    "back": str(c["back"]).strip()
-                })
-        return valid
+        valid = extract_valid_cards(cards)
+        if valid:
+            return valid
     except json.JSONDecodeError as e:
-        print(f"[PARSE] JSON error: {e} — snippet: {cleaned[:300]}")
-        return []
+        pass
 
+    print(f"[PARSE] Could not extract valid cards from response")
+    return []
 async def generate_cards_from_chunk(chunk: str) -> list[dict]:
-    # Truncate large chunks so prompt + response fits in context
-    chunk = chunk[:2000]
+    # Truncate large chunks
+    chunk = chunk[:1500]  # smaller for gemma
 
-    prompt = f"""Generate 2 flashcards from this text.
+    # Ultra-strict prompt for small models
+    prompt = f"""You are a multiple-choice flashcard generator. Generate exactly 2 flashcards.
 
-Rules:
-- Questions should test understanding (why, how, difference between)
-- Answers must be SHORT — 1 sentence max, under 20 words
-- Return ONLY a JSON array, no markdown, no explanation
-- No newlines inside string values
+CRITICAL RULES:
+1. Output ONLY valid JSON. No markdown, no text before or after.
+2. Each flashcard has a "front" (the question), a "choices" array of EXACTLY 4 short answer options, and an "answer" field that is the exact text of the one correct choice.
+3. Exactly 1 of the 4 choices is correct. The other 3 must be plausible, on-topic, but incorrect.
+4. You may occasionally make "All of the above" one of the 4 choices when it fits — use it as the correct "answer" only when the other choices are all individually true.
+5. Keep every choice SHORT: max 12 words, ONE LINE, no newlines, no code blocks.
+6. Questions must be clear and specific.
 
-Format exactly:
-[{{"front": "Question?", "back": "Short answer."}}]
+Format (no variations):
+[{{"front": "What is X?", "choices": ["Correct answer", "Plausible wrong answer", "Another wrong answer", "A third wrong answer"], "answer": "Correct answer"}}, {{...}}]
 
-Text:
-{chunk}"""
+Do not output anything else. Do not explain. Just the JSON array.
+
+TEXT TO MAKE FLASHCARDS FROM:
+{chunk}
+
+Output the 2 flashcards as JSON only:"""
 
     try:
         async with httpx.AsyncClient(timeout=120) as client:
             response = await client.post(
-                "http://localhost:11434/api/generate",
+                f"{OLLAMA_HOST}/api/generate",
                 json={
-                    "model": "mistral",
+                    "model": OLLAMA_MODEL,
                     "prompt": prompt,
                     "stream": False,
-                    "temperature": 0.2,
-                    "options": {"num_predict": 512},
+                    "temperature": 0.1,  # lower temp = stricter, more predictable
+                    "options": {"num_predict": 400},  # smaller models need less budget
                 },
             )
 
@@ -170,7 +220,11 @@ Text:
             return []
 
         result = response.json()
-        return parse_ollama_response(result.get("response", ""))
+        cards = parse_ollama_response(result.get("response", ""))
+        # Shuffle choice order so the correct answer isn't always in the same position
+        for card in cards:
+            random.shuffle(card["choices"])
+        return cards
 
     except Exception as e:
         print(f"[OLLAMA] Exception: {e}")
@@ -200,6 +254,35 @@ def sm2(card: Card, quality: int) -> Card:
 @app.get("/health")
 async def health():
     return {"status": "ok"}
+
+@app.get("/api/models")
+async def list_models():
+    """Ask Ollama which models are installed on this machine."""
+    try:
+        async with httpx.AsyncClient(timeout=10) as client:
+            response = await client.get(f"{OLLAMA_HOST}/api/tags")
+        if response.status_code != 200:
+            raise HTTPException(status_code=502, detail="Could not reach Ollama")
+        data = response.json()
+        # Ollama returns {"models": [{"name": "mistral:latest", ...}, ...]}
+        names = [m["name"] for m in data.get("models", [])]
+        return {"models": names, "active": OLLAMA_MODEL}
+    except httpx.ConnectError:
+        raise HTTPException(status_code=502, detail="Ollama is not running on " + OLLAMA_HOST)
+
+@app.post("/api/config/model")
+async def set_model(model: str):
+    """Switch the active model at runtime."""
+    global OLLAMA_MODEL
+    # Verify the model is actually installed before switching
+    async with httpx.AsyncClient(timeout=10) as client:
+        response = await client.get(f"{OLLAMA_HOST}/api/tags")
+    available = [m["name"] for m in response.json().get("models", [])]
+    if model not in available:
+        raise HTTPException(status_code=400, detail=f"Model '{model}' is not installed. Run: ollama pull {model}")
+    OLLAMA_MODEL = model
+    print(f"[CONFIG] Switched model to {model}")
+    return {"active": OLLAMA_MODEL}
 
 @app.post("/api/ingest")
 async def ingest_document(
@@ -253,7 +336,8 @@ async def ingest_document(
                     id=str(uuid.uuid4()),
                     deckId=deck_id,
                     front=card_data["front"],
-                    back=card_data["back"],
+                    back=card_data["answer"],
+                    choices=json.dumps(card_data["choices"]),
                 )
                 db.add(card)
             db.commit()
@@ -326,6 +410,7 @@ async def get_due_cards(deckId: str):
             "id": c.id,
             "front": c.front,
             "back": c.back,
+            "choices": json.loads(c.choices) if c.choices else [],
             "ef": c.ef,
             "interval": c.interval,
             "reps": c.reps

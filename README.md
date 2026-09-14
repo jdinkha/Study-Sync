@@ -15,16 +15,9 @@ Upload your lecture PDFs and generate study cards with AI
 
 2. Install Ollama: ollama.com
 
-3. Download and run a model of your choice
-for example, to download and run Mistral 7B:
+By default the program will use Mistral, you can change the model by editing backend/main.py
 
-- **Terminal 1**:
-'ollama serve'
-
-- **Terminal 2**:
-'ollama run mistral'
-
-4. Start the app, from the project root:
+3. Start the app, from the project root:
 
 - **Terminal 3**:
 cd backend
@@ -43,5 +36,5 @@ Vite tells you which port the program runs, but by default it is localhost:5173
 ## Architecture
 - **Frontend**: TypeScript + React + Vite
 - **Backend**: Python
-- **Storage** SQLite
+- **Storage**: SQLite
 - Local LLM integration with Ollama

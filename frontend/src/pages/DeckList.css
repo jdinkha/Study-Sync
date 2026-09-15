@@ -35,6 +35,13 @@
   margin: 0;
 }
 
+.dl-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
 .dl-study-btn {
   padding: 0.5rem 1rem;
   background: #444944;
@@ -50,6 +57,23 @@
   flex-shrink: 0;
 }
 .dl-study-btn:hover { opacity: 0.8; }
+
+.dl-delete-btn {
+  padding: 0.5rem 1rem;
+  background: transparent;
+  color: #e57373;
+  border: 1.5px solid #e57373;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+  transition: background 0.15s, opacity 0.15s;
+  flex-shrink: 0;
+}
+.dl-delete-btn:hover:not(:disabled) { background: rgba(229, 115, 115, 0.15); }
+.dl-delete-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
 .dl-state {
   text-align: center;
@@ -76,4 +100,92 @@
   font-size: 14px;
   color: #888780;
   margin: 0;
+}
+
+/* ── Delete confirmation modal ──────────────────────────────────────────────── */
+.dl-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 20, 18, 0.55);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  z-index: 100;
+  animation: dl-fade-in 0.15s ease;
+}
+
+.dl-modal {
+  background: #2c2c2a;
+  border: 1px solid #4a4a46;
+  border-radius: 14px;
+  padding: 1.75rem;
+  width: 100%;
+  max-width: 380px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+  animation: dl-modal-in 0.18s ease;
+}
+
+.dl-modal-title {
+  font-size: 17px;
+  font-weight: 600;
+  color: white;
+  margin: 0 0 0.6rem;
+}
+
+.dl-modal-text {
+  font-size: 14px;
+  line-height: 1.5;
+  color: #cfcdc6;
+  margin: 0 0 1.5rem;
+}
+
+.dl-modal-text strong {
+  color: white;
+  font-weight: 600;
+}
+
+.dl-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.dl-modal-cancel {
+  padding: 0.55rem 1.1rem;
+  background: transparent;
+  color: #cfcdc6;
+  border: 1px solid #57564f;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s;
+}
+.dl-modal-cancel:hover { background: rgba(255, 255, 255, 0.06); }
+
+.dl-modal-confirm {
+  padding: 0.55rem 1.1rem;
+  background: #c0392b;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s;
+}
+.dl-modal-confirm:hover { background: #a5301f; }
+
+@keyframes dl-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes dl-modal-in {
+  from { opacity: 0; transform: translateY(8px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
 }

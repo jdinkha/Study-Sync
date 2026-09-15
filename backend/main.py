@@ -19,7 +19,21 @@ from sqlalchemy.orm import declarative_base, Session, sessionmaker
 load_dotenv()  # reads .env file if present
 
 OLLAMA_HOST = os.getenv("OLLAMA_HOST", "http://localhost:11434")
-OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "mistral")  # fallback to mistral if not set
+
+# Remembers the last model picked from the dropdown so it survives a server restart
+LAST_MODEL_FILE = Path(__file__).parent / ".last_model"
+
+def load_last_model() -> str:
+    if LAST_MODEL_FILE.exists():
+        saved = LAST_MODEL_FILE.read_text().strip()
+        if saved:
+            return saved
+    return os.getenv("OLLAMA_MODEL", "mistral")  # fallback if nothing was ever selected
+
+def save_last_model(model: str):
+    LAST_MODEL_FILE.write_text(model)
+
+OLLAMA_MODEL = load_last_model()
 
 app = FastAPI()
 
@@ -292,6 +306,7 @@ async def set_model(model: str):
     if model not in available:
         raise HTTPException(status_code=400, detail=f"Model '{model}' is not installed. Run: ollama pull {model}")
     OLLAMA_MODEL = model
+    save_last_model(model)
     print(f"[CONFIG] Switched model to {model}")
     return {"active": OLLAMA_MODEL}
 
@@ -404,6 +419,25 @@ async def get_deck(deckId: str):
             "createdAt": deck.createdAt.isoformat(),
             "cardCount": card_count
         }
+    finally:
+        db.close()
+
+@app.delete("/api/decks/{deckId}")
+async def delete_deck(deckId: str):
+    db = SessionLocal()
+    try:
+        deck = db.query(Deck).filter(Deck.id == deckId).first()
+        if not deck:
+            raise HTTPException(status_code=404, detail="Deck not found")
+
+        card_ids = [c.id for c in db.query(Card).filter(Card.deckId == deckId).all()]
+        if card_ids:
+            db.query(ReviewLog).filter(ReviewLog.cardId.in_(card_ids)).delete(synchronize_session=False)
+            db.query(Card).filter(Card.deckId == deckId).delete(synchronize_session=False)
+        db.delete(deck)
+        db.commit()
+
+        return {"message": f"Deleted deck {deckId}"}
     finally:
         db.close()
 

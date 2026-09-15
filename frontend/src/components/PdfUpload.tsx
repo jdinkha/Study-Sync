@@ -36,6 +36,8 @@ export default function PdfUpload({ onSuccess }: { onSuccess?: () => void }) {
     if (files && files.length > 0) {
       handleFile(files[0]);
     }
+    // Reset so selecting the same file again still fires onChange
+    e.currentTarget.value = '';
   };
 
   const handleFile = async (file: File) => {

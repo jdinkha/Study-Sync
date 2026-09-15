@@ -115,6 +115,16 @@ def extract_valid_cards(cards) -> list[dict]:
         valid.append({"front": front, "choices": choices, "answer": match})
     return valid
 
+def shuffle_choices(choices: list[str]) -> list[str]:
+    """Shuffle choice order, but keep "All of the above" pinned as the last option."""
+    def is_all_of_above(s: str) -> bool:
+        return s.strip().rstrip(".").lower() == "all of the above"
+
+    pinned = [c for c in choices if is_all_of_above(c)]
+    rest = [c for c in choices if not is_all_of_above(c)]
+    random.shuffle(rest)
+    return rest + pinned
+
 def parse_ollama_response(text: str) -> list[dict]:
     """Parse JSON from Ollama, being very defensive about malformed input."""
     text = text.strip()
@@ -179,7 +189,7 @@ def parse_ollama_response(text: str) -> list[dict]:
     return []
 async def generate_cards_from_chunk(chunk: str) -> list[dict]:
     # Truncate large chunks
-    chunk = chunk[:1500]  # smaller for gemma
+    chunk = chunk[:2500]  # smaller for gemma
 
     # Ultra-strict prompt for small models
     prompt = f"""You are a multiple-choice flashcard generator. Generate exactly 2 flashcards.
@@ -188,7 +198,7 @@ CRITICAL RULES:
 1. Output ONLY valid JSON. No markdown, no text before or after.
 2. Each flashcard has a "front" (the question), a "choices" array of EXACTLY 4 short answer options, and an "answer" field that is the exact text of the one correct choice.
 3. Exactly 1 of the 4 choices is correct. The other 3 must be plausible, on-topic, but incorrect.
-4. You may occasionally make "All of the above" one of the 4 choices when it fits — use it as the correct "answer" only when the other choices are all individually true.
+4. You may occasionally make "All of the above" one of the 4 choices when it fits — use it as the correct "answer" ONLY when the other choices are all individually true (meaning "All of the above" is allowed to be an incorrect option).
 5. Keep every choice SHORT: max 12 words, ONE LINE, no newlines, no code blocks.
 6. Questions must be clear and specific.
 
@@ -221,9 +231,10 @@ Output the 2 flashcards as JSON only:"""
 
         result = response.json()
         cards = parse_ollama_response(result.get("response", ""))
-        # Shuffle choice order so the correct answer isn't always in the same position
+        # Shuffle choice order (correct answer isn't always in the same slot),
+        # but "All of the above" always stays the last option.
         for card in cards:
-            random.shuffle(card["choices"])
+            card["choices"] = shuffle_choices(card["choices"])
         return cards
 
     except Exception as e:

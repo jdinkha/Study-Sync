@@ -76,9 +76,19 @@ if [ "$MODEL_COUNT" -eq 0 ]; then
 fi
 echo -e "${GREEN}✓ Found $MODEL_COUNT installed model(s)${NC}"
 
-# ── Step 4: Check Python venv / dependencies ────────────────────────────────
+# ── Step 4: Set up backend/.env from .env.example if needed ────────────────
 cd "$BACKEND_DIR"
 
+if [ -f ".env.example" ] && [ ! -f ".env" ]; then
+    cp .env.example .env
+    rm .env.example
+    echo -e "${GREEN}✓ Created backend/.env from .env.example${NC}"
+elif [ -f ".env.example" ] && [ -f ".env" ]; then
+    rm .env.example
+    echo -e "${GREEN}✓ backend/.env already exists — removed leftover .env.example${NC}"
+fi
+
+# ── Step 5: Check Python venv / dependencies ────────────────────────────────
 if [ ! -d "venv" ]; then
     echo -e "${YELLOW}Creating Python virtual environment...${NC}"
     python3 -m venv venv
@@ -92,7 +102,7 @@ if ! python -c "import fastapi" 2>/dev/null; then
 fi
 echo -e "${GREEN}✓ Backend dependencies ready${NC}"
 
-# ── Step 5: Start the backend ────────────────────────────────────────────────
+# ── Step 6: Start the backend ────────────────────────────────────────────────
 echo -e "${YELLOW}Starting backend on http://localhost:8000...${NC}"
 python main.py > /tmp/studysync-backend.log 2>&1 &
 PIDS+=($!)
@@ -109,7 +119,7 @@ for i in $(seq 1 15); do
     fi
 done
 
-# ── Step 6: Check Node dependencies ─────────────────────────────────────────
+# ── Step 7: Check Node dependencies ─────────────────────────────────────────
 cd "$FRONTEND_DIR"
 
 if [ ! -d "node_modules" ]; then
@@ -118,7 +128,7 @@ if [ ! -d "node_modules" ]; then
 fi
 echo -e "${GREEN}✓ Frontend dependencies ready${NC}"
 
-# ── Step 7: Start the frontend ───────────────────────────────────────────────
+# ── Step 8: Start the frontend ───────────────────────────────────────────────
 echo -e "${YELLOW}Starting frontend on http://localhost:5173...${NC}"
 npm run dev > /tmp/studysync-frontend.log 2>&1 &
 PIDS+=($!)

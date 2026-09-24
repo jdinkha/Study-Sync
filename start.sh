@@ -79,13 +79,14 @@ echo -e "${GREEN}✓ Found $MODEL_COUNT installed model(s)${NC}"
 # ── Step 4: Set up backend/.env from .env.example if needed ────────────────
 cd "$BACKEND_DIR"
 
-if [ -f ".env.example" ] && [ ! -f ".env" ]; then
-    cp .env.example .env
-    rm .env.example
-    echo -e "${GREEN}✓ Created backend/.env from .env.example${NC}"
-elif [ -f ".env.example" ] && [ -f ".env" ]; then
-    rm .env.example
-    echo -e "${GREEN}✓ backend/.env already exists — removed leftover .env.example${NC}"
+# .env.example is a tracked template — copy it, never delete it
+if [ ! -f ".env" ]; then
+    if [ -f ".env.example" ]; then
+        cp .env.example .env
+        echo -e "${GREEN}✓ Created backend/.env from .env.example${NC}"
+    else
+        echo -e "${YELLOW}⚠ No backend/.env or .env.example found — using defaults${NC}"
+    fi
 fi
 
 # ── Step 5: Check Python venv / dependencies ────────────────────────────────

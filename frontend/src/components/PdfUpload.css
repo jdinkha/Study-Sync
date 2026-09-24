@@ -5,7 +5,8 @@
 }
 
 .upload-area {
-  border: 2px dashed #d3d1c7;
+  background: var(--surface);
+  border: 2px dashed var(--border-strong);
   border-radius: 12px;
   padding: 3rem 2rem;
   text-align: center;
@@ -13,10 +14,13 @@
   transition: all 0.2s;
 }
 
+.upload-area:hover {
+  border-color: var(--accent);
+}
+
 .upload-area.dragging {
-  border-color: #378add;
-  background-color: #e6f1fb;
-  border: 2px solid #378add;
+  border: 2px solid var(--accent);
+  background-color: var(--accent-soft);
 }
 
 .upload-content {
@@ -27,20 +31,21 @@
   font-size: 18px;
   font-weight: 500;
   margin: 0 0 0.5rem;
-  color: white
+  color: var(--text-primary);
 }
 
 .upload-subtitle {
   font-size: 14px;
-  color: #999890;
+  color: var(--text-secondary);
   margin: 0;
 }
 
 .upload-button {
   display: inline-block;
   padding: 0.75rem 1.5rem;
-  background: white;
-  border: 0.5px solid #b4b2a9;
+  background: var(--surface-muted);
+  color: var(--text-primary);
+  border: 1px solid var(--border-strong);
   border-radius: 8px;
   cursor: pointer;
   font-size: 14px;
@@ -49,7 +54,7 @@
 }
 
 .upload-button:hover {
-  background: #f1efe8;
+  background: var(--surface-hover);
 }
 
 .form-section {
@@ -61,16 +66,22 @@
 
 .deck-name-input {
   padding: 0.5rem 0.75rem;
-  border: 0.5px solid #b4b2a9;
+  background: var(--surface);
+  color: var(--text-primary);
+  border: 1px solid var(--border-strong);
   border-radius: 8px;
   font-size: 14px;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: inherit;
+}
+
+.deck-name-input::placeholder {
+  color: var(--text-tertiary);
 }
 
 .deck-name-input:focus {
   outline: none;
-  border-color: #378add;
-  box-shadow: 0 0 0 2px #e6f1fb;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
 }
 
 .progress-section {
@@ -80,7 +91,7 @@
 .progress-bar {
   width: 100%;
   height: 8px;
-  background: #d3d1c7;
+  background: var(--surface-muted);
   border-radius: 4px;
   overflow: hidden;
   margin-bottom: 0.5rem;
@@ -88,18 +99,18 @@
 
 .progress-fill {
   height: 100%;
-  background: #378add;
+  background: var(--accent);
   transition: width 0.3s;
 }
 
 .progress-text {
   font-size: 12px;
-  color: #888780;
+  color: var(--text-secondary);
   margin: 0;
 }
 
 .error-message {
   font-size: 14px;
-  color: #a32d2d;
+  color: var(--danger);
   margin: 0;
 }

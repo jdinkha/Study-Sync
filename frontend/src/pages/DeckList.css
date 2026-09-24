@@ -11,27 +11,30 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #333333;
-  border: 2px solid #555555;
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 12px;
   padding: 1rem 1.25rem;
-  transition: border-color 0.15s;
+  box-shadow: var(--shadow-sm);
+  transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
 }
 
 .dl-card:hover {
-  border-color: #b4b2a9;
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
 }
 
 .dl-card-name {
   font-size: 15px;
   font-weight: 500;
-  color: white;
+  color: var(--text-primary);
   margin: 0 0 4px;
 }
 
 .dl-card-meta {
   font-size: 12px;
-  color: #b0b0b0;
+  color: var(--text-secondary);
   margin: 0;
 }
 
@@ -44,8 +47,8 @@
 
 .dl-study-btn {
   padding: 0.5rem 1rem;
-  background: #444944;
-  color: white;
+  background: var(--accent);
+  color: var(--on-accent);
   border: none;
   border-radius: 8px;
   font-size: 13px;
@@ -53,16 +56,16 @@
   cursor: pointer;
   font-family: inherit;
   white-space: nowrap;
-  transition: opacity 0.15s;
+  transition: background 0.15s;
   flex-shrink: 0;
 }
-.dl-study-btn:hover { opacity: 0.8; }
+.dl-study-btn:hover { background: var(--accent-hover); }
 
 .dl-delete-btn {
   padding: 0.5rem 1rem;
   background: transparent;
-  color: #e57373;
-  border: 1.5px solid #e57373;
+  color: var(--danger);
+  border: 1px solid var(--danger);
   border-radius: 8px;
   font-size: 13px;
   font-weight: 500;
@@ -72,17 +75,17 @@
   transition: background 0.15s, opacity 0.15s;
   flex-shrink: 0;
 }
-.dl-delete-btn:hover:not(:disabled) { background: rgba(229, 115, 115, 0.15); }
+.dl-delete-btn:hover:not(:disabled) { background: var(--danger-soft); }
 .dl-delete-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
 .dl-state {
   text-align: center;
   padding: 3rem;
-  color: #888780;
+  color: var(--text-secondary);
   font-size: 15px;
 }
 
-.dl-error { color: #c0392b; }
+.dl-error { color: var(--danger); }
 
 .dl-empty {
   text-align: center;
@@ -92,13 +95,13 @@
 .dl-empty-title {
   font-size: 18px;
   font-weight: 500;
-  color: #2c2c2a;
+  color: var(--text-primary);
   margin: 0 0 0.5rem;
 }
 
 .dl-empty-sub {
   font-size: 14px;
-  color: #888780;
+  color: var(--text-secondary);
   margin: 0;
 }
 
@@ -106,7 +109,7 @@
 .dl-modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(20, 20, 18, 0.55);
+  background: var(--overlay);
   backdrop-filter: blur(2px);
   display: flex;
   align-items: center;
@@ -117,32 +120,32 @@
 }
 
 .dl-modal {
-  background: #2c2c2a;
-  border: 1px solid #4a4a46;
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
   border-radius: 14px;
   padding: 1.75rem;
   width: 100%;
   max-width: 380px;
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+  box-shadow: var(--shadow-lg);
   animation: dl-modal-in 0.18s ease;
 }
 
 .dl-modal-title {
   font-size: 17px;
   font-weight: 600;
-  color: white;
+  color: var(--text-primary);
   margin: 0 0 0.6rem;
 }
 
 .dl-modal-text {
   font-size: 14px;
   line-height: 1.5;
-  color: #cfcdc6;
+  color: var(--text-secondary);
   margin: 0 0 1.5rem;
 }
 
 .dl-modal-text strong {
-  color: white;
+  color: var(--text-primary);
   font-weight: 600;
 }
 
@@ -155,8 +158,8 @@
 .dl-modal-cancel {
   padding: 0.55rem 1.1rem;
   background: transparent;
-  color: #cfcdc6;
-  border: 1px solid #57564f;
+  color: var(--text-primary);
+  border: 1px solid var(--border-strong);
   border-radius: 8px;
   font-size: 13px;
   font-weight: 500;
@@ -164,12 +167,12 @@
   font-family: inherit;
   transition: background 0.15s;
 }
-.dl-modal-cancel:hover { background: rgba(255, 255, 255, 0.06); }
+.dl-modal-cancel:hover { background: var(--surface-hover); }
 
 .dl-modal-confirm {
   padding: 0.55rem 1.1rem;
-  background: #c0392b;
-  color: white;
+  background: var(--danger);
+  color: #fff;
   border: none;
   border-radius: 8px;
   font-size: 13px;
@@ -178,7 +181,7 @@
   font-family: inherit;
   transition: background 0.15s;
 }
-.dl-modal-confirm:hover { background: #a5301f; }
+.dl-modal-confirm:hover { background: var(--danger-hover); }
 
 @keyframes dl-fade-in {
   from { opacity: 0; }

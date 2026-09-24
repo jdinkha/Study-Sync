@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import PdfUpload from './components/PdfUpload';
+import ThemeToggle from './components/ThemeToggle';
 import DeckList from './pages/DeckList';
 import StudySession from './pages/StudySession';
 import './App.css';
@@ -16,19 +17,19 @@ export default function App() {
   const [activeModel, setActiveModel] = useState('');
 
   useEffect(() => {
+    async function fetchModels() {
+      try {
+        const res = await fetch('http://localhost:8000/api/models');
+        const data = await res.json();
+        setModels(data.models);
+        setActiveModel(data.active);
+      } catch {
+        // Ollama not running — silently ignore, backend will catch it on upload
+      }
+    }
+
     fetchModels();
   }, []);
-
-  async function fetchModels() {
-    try {
-      const res = await fetch('http://localhost:8000/api/models');
-      const data = await res.json();
-      setModels(data.models);
-      setActiveModel(data.active);
-    } catch {
-      // Ollama not running — silently ignore, backend will catch it on upload
-    }
-  }
 
   async function handleModelChange(model: string) {
     setActiveModel(model);
@@ -50,6 +51,8 @@ export default function App() {
 
   return (
     <div className="app">
+      <ThemeToggle />
+
       {view.name !== 'study' && (
         <header className="app-header">
           <div className="app-header-inner">

@@ -18,21 +18,21 @@ export default function DeckList({ onStudy }: {
   const [confirmDeck, setConfirmDeck] = useState<Deck | null>(null);
 
   useEffect(() => {
+    async function fetchDecks() {
+      try {
+        const res = await fetch('http://localhost:8000/api/decks?userId=user1');
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || 'Failed to load decks');
+        setDecks(data);
+      } catch (e) {
+        setError(e instanceof Error ? e.message : 'Failed to load decks');
+      } finally {
+        setLoading(false);
+      }
+    }
+
     fetchDecks();
   }, []);
-
-  async function fetchDecks() {
-    try {
-      const res = await fetch('http://localhost:8000/api/decks?userId=user1');
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.detail || 'Failed to load decks');
-      setDecks(data);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'Failed to load decks');
-    } finally {
-      setLoading(false);
-    }
-  }
 
   async function confirmDelete() {
     if (!confirmDeck) return;

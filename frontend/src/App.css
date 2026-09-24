@@ -1,11 +1,11 @@
 .app {
   min-height: 100vh;
-  background: #fafbf8;
+  background: var(--bg);
 }
 
 .app-header {
-  background: white;
-  border-bottom: 0.5px solid #d3d1c7;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
   padding: 2rem;
 }
 
@@ -21,9 +21,10 @@
 .app-title {
   margin: 0;
   font-size: 32px;
-  font-weight: 500;
+  font-weight: 600;
+  letter-spacing: -0.02em;
   cursor: pointer;
-  color: #2c2c2a;
+  color: var(--text-primary);
 }
 .app-title:hover {
   opacity: 0.8;
@@ -36,9 +37,9 @@
 
 .app-nav-btn {
   padding: 0.65rem 1.25rem;
-  background: #f1efe8;
-  color: #2c2c2a;
-  border: 0.5px solid #d3d1c7;
+  background: var(--surface-muted);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
   border-radius: 8px;
   font-size: 14px;
   font-weight: 500;
@@ -48,18 +49,18 @@
 }
 
 .app-nav-btn:hover {
-  background: #e8e6df;
-  border-color: #b4b2a9;
+  background: var(--surface-hover);
+  border-color: var(--border-strong);
 }
 
 .app-nav-btn.active {
-  background: #2c2c2a;
-  color: white;
-  border-color: #2c2c2a;
+  background: var(--accent);
+  color: var(--on-accent);
+  border-color: var(--accent);
 }
 .app-nav-btn.active:hover {
-  background: #1a1a18;
-  border-color: #1a1a18;
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
 }
 
 .app-main {
@@ -68,6 +69,8 @@
 
 .app-header-controls {
   display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   align-items: center;
   gap: 1.5rem;
 }
@@ -80,16 +83,16 @@
 
 .app-model-label {
   font-size: 12px;
-  color: #888780;
+  color: var(--text-secondary);
   font-weight: 500;
   white-space: nowrap;
 }
 
 .app-model-select {
   padding: 0.5rem 0.75rem;
-  background: #f1efe8;
-  color: #2c2c2a;
-  border: 0.5px solid #d3d1c7;
+  background: var(--surface-muted);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
   border-radius: 8px;
   font-size: 13px;
   font-family: inherit;
@@ -98,10 +101,56 @@
 }
 
 .app-model-select:hover {
-  border-color: #b4b2a9;
+  border-color: var(--border-strong);
 }
 
 .app-model-select:focus {
   outline: none;
-  border-color: #378add;
+  border-color: var(--accent);
+}
+
+/* ── Theme toggle (fixed top-right, visible on every view) ─────────────────── */
+.theme-toggle {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 50;
+  display: flex;
+  padding: 3px;
+  gap: 2px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  box-shadow: var(--shadow-sm);
+}
+
+.theme-toggle-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0.4rem 0.8rem;
+  background: transparent;
+  color: var(--text-secondary);
+  border: none;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.theme-toggle-btn:hover {
+  color: var(--text-primary);
+}
+.theme-toggle-btn.active {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+.theme-toggle-btn svg {
+  width: 15px;
+  height: 15px;
+}
+
+@media (max-width: 560px) {
+  .theme-toggle-btn span { display: none; }
+  .theme-toggle-btn { padding: 0.45rem; }
 }

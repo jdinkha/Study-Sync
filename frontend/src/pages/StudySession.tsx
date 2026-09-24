@@ -36,23 +36,23 @@ export default function StudySession({ deckId, deckName, onBack }: {
   const [error, setError] = useState('');
 
   useEffect(() => {
+    async function fetchDueCards() {
+      setLoading(true);
+      try {
+        const res = await fetch(`http://localhost:8000/api/cards/due?deckId=${deckId}`);
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || 'Failed to load cards');
+        setCards(data);
+        if (data.length === 0) setDone(true);
+      } catch (e) {
+        setError(e instanceof Error ? e.message : 'Failed to load cards');
+      } finally {
+        setLoading(false);
+      }
+    }
+
     fetchDueCards();
   }, [deckId]);
-
-  async function fetchDueCards() {
-    setLoading(true);
-    try {
-      const res = await fetch(`http://localhost:8000/api/cards/due?deckId=${deckId}`);
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.detail || 'Failed to load cards');
-      setCards(data);
-      if (data.length === 0) setDone(true);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'Failed to load cards');
-    } finally {
-      setLoading(false);
-    }
-  }
 
   async function submitRating(quality: number) {
     if (submitting) return;

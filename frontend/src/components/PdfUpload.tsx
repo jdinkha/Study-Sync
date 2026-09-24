@@ -1,15 +1,9 @@
 import { useState } from 'react';
 import './PdfUpload.css';
 
-interface UploadResponse {
-  deckId: string;
-  cardCount: number;
-}
-
 export default function PdfUpload({ onSuccess }: { onSuccess?: () => void }) {
   const [isDragging, setIsDragging] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [progress, setProgress] = useState(0);
   const [deckName, setDeckName] = useState('');
   const [error, setError] = useState('');
 
@@ -59,7 +53,6 @@ export default function PdfUpload({ onSuccess }: { onSuccess?: () => void }) {
 
     setIsLoading(true);
     setError('');
-    setProgress(0);
 
     try {
       const formData = new FormData();
@@ -79,7 +72,6 @@ export default function PdfUpload({ onSuccess }: { onSuccess?: () => void }) {
         return;
       }
 
-      setProgress(100);
       setDeckName('');
       setTimeout(() => onSuccess?.(), 600);
     } catch (err) {

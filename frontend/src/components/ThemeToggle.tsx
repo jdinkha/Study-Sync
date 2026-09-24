@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 type Theme = 'light' | 'dark';
 
 const STORAGE_KEY = 'studysync-theme';
+const THEME_FADE_MS = 600; // matches .theme-transition in index.css
 
 function initialTheme(): Theme {
   // index.html sets data-theme before first paint; reuse it so React agrees.
@@ -13,6 +14,21 @@ function initialTheme(): Theme {
 
 export default function ThemeToggle() {
   const [theme, setTheme] = useState<Theme>(initialTheme);
+  const fadeTimer = useRef<number | undefined>(undefined);
+
+  function changeTheme(next: Theme) {
+    if (next === theme) return;
+    const root = document.documentElement;
+    root.classList.add('theme-transition');
+    window.clearTimeout(fadeTimer.current);
+    fadeTimer.current = window.setTimeout(
+      () => root.classList.remove('theme-transition'),
+      THEME_FADE_MS,
+    );
+    setTheme(next);
+  }
+
+  useEffect(() => () => window.clearTimeout(fadeTimer.current), []);
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
@@ -28,7 +44,7 @@ export default function ThemeToggle() {
       <button
         className={`theme-toggle-btn ${theme === 'light' ? 'active' : ''}`}
         aria-pressed={theme === 'light'}
-        onClick={() => setTheme('light')}
+        onClick={() => changeTheme('light')}
         title="Light mode"
       >
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -40,7 +56,7 @@ export default function ThemeToggle() {
       <button
         className={`theme-toggle-btn ${theme === 'dark' ? 'active' : ''}`}
         aria-pressed={theme === 'dark'}
-        onClick={() => setTheme('dark')}
+        onClick={() => changeTheme('dark')}
         title="Dark mode"
       >
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">

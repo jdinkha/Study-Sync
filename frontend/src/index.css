@@ -81,7 +81,17 @@ body {
   -moz-osx-font-smoothing: grayscale;
   background: var(--bg);
   color: var(--text-primary);
-  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* Applied to <html> only while switching theme, so every surface, border and
+   text colour fades together over the same duration. Hover transitions stay
+   snappy the rest of the time. Keep in sync with THEME_FADE_MS. */
+.theme-transition,
+.theme-transition *,
+.theme-transition *::before,
+.theme-transition *::after {
+  transition: background-color 0.6s ease, color 0.6s ease, border-color 0.6s ease,
+    box-shadow 0.6s ease, fill 0.6s ease, stroke 0.6s ease !important;
 }
 
 code {

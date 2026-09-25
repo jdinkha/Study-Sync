@@ -38,3 +38,7 @@ Vite tells you which port the program runs, but by default it is localhost:5173
 - **Backend**: Python
 - **Storage**: SQLite
 - Local LLM integration with Ollama
+
+## Demo
+<img width="3454" height="1574" alt="demo2" src="https://github.com/user-attachments/assets/98f85627-41c5-4bdd-be45-a9fc5dd5f01c" />
+

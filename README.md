@@ -40,5 +40,4 @@ Vite tells you which port the program runs, but by default it is localhost:5173
 - Local LLM integration with Ollama
 
 ## Demo
-<img width="3454" height="1574" alt="demo2" src="https://github.com/user-attachments/assets/98f85627-41c5-4bdd-be45-a9fc5dd5f01c" />
-
+<img width="3400" height="1540" alt="high_quality" src="https://github.com/user-attachments/assets/fe99d067-2b70-4049-b7ce-0cbaca97fd4b" />

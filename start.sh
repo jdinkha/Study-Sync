@@ -71,7 +71,6 @@ fi
 MODEL_COUNT=$(curl -s http://localhost:11434/api/tags | grep -o '"name"' | wc -l | tr -d ' ')
 if [ "$MODEL_COUNT" -eq 0 ]; then
     echo -e "${RED}✗ No Ollama models installed.${NC}"
-    echo "  Run: ollama pull mistral"
     cleanup
 fi
 echo -e "${GREEN}✓ Found $MODEL_COUNT installed model(s)${NC}"
@@ -97,10 +96,14 @@ fi
 
 source venv/bin/activate
 
-if ! python -c "import fastapi" 2>/dev/null; then
+echo -e "${YELLOW}Checking dependencies...${NC}"
+OUTPUT=$(pip install -q -r requirements.txt 2>&1)
+
+# Check if pip actually had to install something new
+if echo "$OUTPUT" | grep -q "Collecting"; then
     echo -e "${YELLOW}Installing backend dependencies...${NC}"
-    pip install -q -r requirements.txt
 fi
+
 echo -e "${GREEN}✓ Backend dependencies ready${NC}"
 
 # ── Step 6: Start the backend ────────────────────────────────────────────────

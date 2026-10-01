@@ -289,7 +289,6 @@ async def list_models():
         if response.status_code != 200:
             raise HTTPException(status_code=502, detail="Could not reach Ollama")
         data = response.json()
-        # Ollama returns {"models": [{"name": "mistral:latest", ...}, ...]}
         names = [m["name"] for m in data.get("models", [])]
         return {"models": names, "active": OLLAMA_MODEL}
     except httpx.ConnectError:

@@ -6,6 +6,7 @@ import httpx
 import json
 import re
 import os
+import sys
 import tempfile
 import datetime
 import uuid
@@ -23,12 +24,25 @@ OLLAMA_HOST = os.getenv("OLLAMA_HOST", "http://localhost:11434")
 # Remembers the last model picked from the dropdown so it survives a server restart
 LAST_MODEL_FILE = Path(__file__).parent / ".last_model"
 
+def get_installed_models() -> list[str]:
+    """Ask Ollama which models are installed. Exits if Ollama is unreachable or has none."""
+    try:
+        response = httpx.get(f"{OLLAMA_HOST}/api/tags", timeout=10)
+        response.raise_for_status()
+    except httpx.HTTPError:
+        sys.exit(f"Error: could not reach Ollama at {OLLAMA_HOST}. Is it running?")
+    names = [m["name"] for m in response.json().get("models", [])]
+    if not names:
+        sys.exit("Error: no Ollama models installed. Install one with: ollama pull <model>")
+    return names
+
 def load_last_model() -> str:
+    installed = get_installed_models()
     if LAST_MODEL_FILE.exists():
         saved = LAST_MODEL_FILE.read_text().strip()
         if saved:
             return saved
-    return os.getenv("OLLAMA_MODEL", "mistral")  # fallback if nothing was ever selected
+    return os.getenv("OLLAMA_MODEL") or installed[0]  # fallback if nothing was ever selected
 
 def save_last_model(model: str):
     LAST_MODEL_FILE.write_text(model)

@@ -40,7 +40,7 @@ echo ""
 # ── Step 1: Check Ollama is installed ───────────────────────────────────────
 if ! command -v ollama &> /dev/null; then
     echo -e "${RED}✗ Ollama is not installed.${NC}"
-    echo "  Install it from: https://ollama.ai"
+    echo "  Install it from: https://ollama.com"
     exit 1
 fi
 echo -e "${GREEN}✓ Ollama is installed${NC}"

@@ -97,11 +97,13 @@ fi
 source venv/bin/activate
 
 echo -e "${YELLOW}Checking dependencies...${NC}"
-OUTPUT=$(pip install -q -r requirements.txt 2>&1)
 
-# Check if pip actually had to install something new
-if echo "$OUTPUT" | grep -q "Collecting"; then
-    echo -e "${YELLOW}Installing backend dependencies...${NC}"
+# --only-binary=pymupdf: never compile MuPDF from source (it maxes out every
+# core and can exhaust RAM). If no prebuilt wheel exists, fail fast instead.
+if ! OUTPUT=$(pip install -q --only-binary=pymupdf -r requirements.txt 2>&1); then
+    echo -e "${RED}✗ Failed to install backend dependencies:${NC}"
+    echo "$OUTPUT"
+    cleanup
 fi
 
 echo -e "${GREEN}✓ Backend dependencies ready${NC}"

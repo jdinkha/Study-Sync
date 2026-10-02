@@ -6,7 +6,7 @@ Upload your lecture PDFs and generate study cards with AI
 
 ## Prerequisites
 1. **Python**
-2. **Node.js/Vite**
+2. **Node.js 20.19+ or 22.12+ / Vite**
 3. **Ollama**
 
 ## Quick start
